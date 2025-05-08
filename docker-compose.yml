@@ -1,8 +1,9 @@
-version: "3.8"
+version: "3.9"
 
 services:
   frontend:
     build: ./frontend
+    image: ramboo2023/fullstack-frontend:latest
     ports:
       - "3000:80"
     depends_on:
@@ -10,6 +11,7 @@ services:
 
   backend:
     build: ./backend
+    image: ramboo2023/fullstack-backend:latest
     ports:
       - "5000:5000"
     environment:
@@ -24,24 +26,24 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api"]
       interval: 10s
       retries: 5
-      start_period: 30s  # Give more time to initialize
-      timeout: 10s  # Timeout in case the backend is slow
+      start_period: 30s
+      timeout: 10s
 
   database:
     image: postgres:16
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mydb
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "mydb"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       retries: 5
-      start_period: 30s
-      timeout: 10s
+      timeout: 5s
 
 volumes:
   db-data:
